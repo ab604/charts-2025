@@ -1,0 +1,40 @@
+"Characteristic","Non_smoker","Former_smoker","Smoker","Missing"
+"Number of lung cancer patients",7154,543,22019,15847
+"Sex: male",3487,315,11446,9321
+"Age (years), median",77,72,69,75
+"Age groups (years)",NA,NA,NA,NA
+"18-29",14,0,2,6
+"30-39",38,2,61,29
+"40-49",111,9,681,229
+"50-59",377,37,3109,1137
+"60-69",1263,182,7436,3368
+"70-79",2536,231,7678,6300
+"80-89",2366,75,2885,4220
+"90+",449,8,165,558
+"Prior history, days",3626.5,3198,3676,3662
+"General conditions (any time prior)",NA,NA,NA,NA
+"Atrial Fibrillation",687,36,1119,1348
+"Cerebrovascular Disease",606,47,1812,1360
+"Chronic Liver Disease",25,7,153,57
+"Chronic Obstructive Lung Disease",905,181,6588,3450
+"Coronary Arteriosclerosis",114,7,304,250
+"Crohn's Disease",19,2,87,47
+"Dementia",155,2,305,302
+"Depressive Disorder",793,64,3721,1811
+"Diabetes Mellitus",1101,73,2406,1725
+"Gastroesophageal Reflux Disease",229,23,556,448
+"Gastrointestinal Hemorrhage",590,39,1353,1117
+"Heart Disease",1979,148,4422,4131
+"Heart Failure",368,31,707,895
+"HIV",2,2,7,2
+"Hyperlipidemia",823,62,2227,1469
+"Hypertensive disorder",2420,152,5587,4226
+"Ischemic Heart Disease",1115,103,2728,2282
+"Obesity",186,11,391,340
+"Osteoarthritis",1829,117,4163,3721
+"Peripheral Vascular Disease",208,30,1332,685
+"Pneumonia",377,37,1156,963
+"Pulmonary Embolism",170,2,309,309
+"Renal Impairment",1466,67,2353,2244
+"Ulcerative Colitis",34,2,60,83
+"Venous Thrombosis",463,32,908,915

@@ -1,0 +1,45 @@
+"Characteristic","England","Northern_Ireland","Scotland","Wales"
+"Number of lung cancer patients",21595,2363,14118,7487
+"Sex: male",12087,1273,7202,4007
+"Age (years), median",73,71,72,73
+"Age groups (years)",NA,NA,NA,NA
+"18-29",16,0,2,5
+"30-39",63,2,49,15
+"40-49",519,55,299,157
+"50-59",2212,260,1484,704
+"60-69",5692,710,3857,1990
+"70-79",7750,843,5317,2835
+"80-89",4706,447,2820,1573
+"90+",637,46,289,208
+"Prior history, days",3691,4180,3444.5,3820
+"Smoking status (any time 5 years prior)",NA,NA,NA,NA
+"Non-smoker",3600,410,1896,1248
+"Former smoker",367,19,92,65
+"Current smoker",9331,1321,7673,3694
+"Missing",8297,613,4457,2480
+"General conditions (any time prior)",NA,NA,NA,NA
+"Atrial Fibrillation",1535,192,904,559
+"Cerebrovascular Disease",1806,212,1207,600
+"Chronic Liver Disease",86,19,89,48
+"Chronic Obstructive Lung Disease",5058,650,3537,1879
+"Coronary Arteriosclerosis",292,20,274,89
+"Crohn's Disease",65,16,48,25
+"Dementia",332,52,270,111
+"Depressive Disorder",3237,455,1716,981
+"Diabetes Mellitus",2474,311,1553,967
+"Gastroesophageal Reflux Disease",513,56,404,283
+"Gastrointestinal Hemorrhage",1691,235,614,559
+"Heart Disease",5305,598,3079,1698
+"Heart Failure",1075,114,521,291
+"HIV",5,2,2,2
+"Hyperlipidemia",2367,350,1011,853
+"Hypertensive disorder",6293,639,3363,2090
+"Ischemic Heart Disease",3180,356,1746,946
+"Obesity",432,64,251,181
+"Osteoarthritis",5218,491,2499,1622
+"Peripheral Vascular Disease",1014,151,789,301
+"Pneumonia",1232,168,727,406
+"Pulmonary Embolism",386,29,242,135
+"Renal Impairment",2832,389,1823,1086
+"Ulcerative Colitis",103,13,36,29
+"Venous Thrombosis",1275,134,482,427
