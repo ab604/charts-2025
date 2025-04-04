@@ -128,10 +128,10 @@
     let shadowOffsetMagnitude;
     if (currentPhase <= 0.5) {
       // Waxing moon (0 = new, 0.5 = full)
-      shadowOffsetMagnitude = radius * (-1 + 4 * currentPhase);
+      shadowOffsetMagnitude = radius * (-1 + 2 * currentPhase);
     } else {
       // Waning moon (0.5 = full, 1 = new)
-      shadowOffsetMagnitude = radius * (3 - 4 * currentPhase);
+      shadowOffsetMagnitude = radius * (1 - 2 * (1 - currentPhase));
     }
 
     const shadowOffsetX = shadowOffsetMagnitude * Math.cos(rotationRad);
