@@ -3,7 +3,6 @@
 <head>
   <title>Current Moon Phase for Southampton, UK</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.3/luxon.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@900&family=Azeret+Mono&display=swap');
 
@@ -37,13 +36,26 @@
       margin-bottom: 20px;
       font-family: 'Azeret Mono', monospace;
     }
-
     .footer {
       color: #666666;
       font-size: 12px;
       margin-top: 30px;
       font-family: 'Azeret Mono', monospace;
       max-width: 400px;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    .controls input, .controls button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+    .controls button {
+      cursor: pointer;
     }
   </style>
 </head>
@@ -54,29 +66,114 @@
     <h2 id="phase-name"></h2>
     <h2 id="date-display"></h2>
     <svg id="moon-svg" width="400" height="400"></svg>
+    <div class="controls">
+      <input type="date" id="date-input">
+      <button id="show-date-btn">Show for this date</button>
+      <button id="reset-btn">Reset to today</button>
+    </div>
     <div class="footer">Made by: Alistair Bailey<br>Code: https://github.com/ab604/moon-phase</div>
   </div>
 
   <script>
-    // Calculate the current moon phase
-    // Using the recent new moon from March 29, 2025 as reference
-    function getMoonPhase(date) {
-      // Use the date passed or current date
-      const d = date || new Date();
+    // Moon phase data for 2025 (from the official calendar)
+    const moonPhaseData2025 = {
+      newMoons: [
+        { date: new Date("2025-01-29T12:35:00"), lunation: 1263 },
+        { date: new Date("2025-02-28T00:44:00"), lunation: 1264 },
+        { date: new Date("2025-03-29T10:57:00"), lunation: 1265 },
+        { date: new Date("2025-04-27T20:31:00"), lunation: 1266 },
+        { date: new Date("2025-05-27T04:02:00"), lunation: 1267 },
+        { date: new Date("2025-06-25T11:31:00"), lunation: 1268 },
+        { date: new Date("2025-07-24T20:11:00"), lunation: 1269 },
+        { date: new Date("2025-08-23T07:06:00"), lunation: 1270 },
+        { date: new Date("2025-09-21T20:54:00"), lunation: 1271 },
+        { date: new Date("2025-10-21T13:25:00"), lunation: 1272 },
+        { date: new Date("2025-11-20T06:47:00"), lunation: 1273 },
+        { date: new Date("2025-12-20T01:43:00"), lunation: 1274 }
+      ],
+      firstQuarters: [
+        { date: new Date("2025-01-06T23:56:00"), lunation: 1262 },
+        { date: new Date("2025-02-05T08:02:00"), lunation: 1263 },
+        { date: new Date("2025-03-06T16:31:00"), lunation: 1264 },
+        { date: new Date("2025-04-05T03:14:00"), lunation: 1265 },
+        { date: new Date("2025-05-04T14:51:00"), lunation: 1266 },
+        { date: new Date("2025-06-03T04:40:00"), lunation: 1267 },
+        { date: new Date("2025-07-02T20:30:00"), lunation: 1268 },
+        { date: new Date("2025-08-01T13:41:00"), lunation: 1269 },
+        { date: new Date("2025-08-31T07:25:00"), lunation: 1270 },
+        { date: new Date("2025-09-30T00:53:00"), lunation: 1271 },
+        { date: new Date("2025-10-29T16:20:00"), lunation: 1272 },
+        { date: new Date("2025-11-28T06:58:00"), lunation: 1273 },
+        { date: new Date("2025-12-27T19:09:00"), lunation: 1274 }
+      ],
+      fullMoons: [
+        { date: new Date("2025-01-13T22:26:00"), lunation: 1262 },
+        { date: new Date("2025-02-12T13:53:00"), lunation: 1263 },
+        { date: new Date("2025-03-14T06:54:00"), lunation: 1264 },
+        { date: new Date("2025-04-13T01:22:00"), lunation: 1265 },
+        { date: new Date("2025-05-12T17:55:00"), lunation: 1266 },
+        { date: new Date("2025-06-11T08:43:00"), lunation: 1267 },
+        { date: new Date("2025-07-10T21:36:00"), lunation: 1268 },
+        { date: new Date("2025-08-09T08:54:00"), lunation: 1269 },
+        { date: new Date("2025-09-07T19:08:00"), lunation: 1270 },
+        { date: new Date("2025-10-07T04:47:00"), lunation: 1271 },
+        { date: new Date("2025-11-05T13:19:00"), lunation: 1272 },
+        { date: new Date("2025-12-04T23:14:00"), lunation: 1273 }
+      ],
+      thirdQuarters: [
+        { date: new Date("2025-01-21T20:30:00"), lunation: 1262 },
+        { date: new Date("2025-02-20T17:32:00"), lunation: 1263 },
+        { date: new Date("2025-03-22T11:29:00"), lunation: 1264 },
+        { date: new Date("2025-04-21T02:35:00"), lunation: 1265 },
+        { date: new Date("2025-05-20T12:58:00"), lunation: 1266 },
+        { date: new Date("2025-06-18T20:19:00"), lunation: 1267 },
+        { date: new Date("2025-07-18T01:37:00"), lunation: 1268 },
+        { date: new Date("2025-08-16T06:12:00"), lunation: 1269 },
+        { date: new Date("2025-09-14T11:32:00"), lunation: 1270 },
+        { date: new Date("2025-10-13T19:12:00"), lunation: 1271 },
+        { date: new Date("2025-11-12T05:28:00"), lunation: 1272 },
+        { date: new Date("2025-12-11T20:51:00"), lunation: 1273 }
+      ]
+    };
 
-      // Reference new moon on March 29, 2025
-      const recentNewMoon = new Date('2025-03-29T00:00:00Z');
+    // Calculate the moon phase based on accurate data
+    function getMoonPhase(currentDate) {
+      // Find the closest events before and after the given date
+      let prevNewMoon = null;
+      let nextNewMoon = null;
+
+      // Find the surrounding new moons
+      for (let i = 0; i < moonPhaseData2025.newMoons.length; i++) {
+        const newMoon = moonPhaseData2025.newMoons[i];
+        if (newMoon.date <= currentDate) {
+          prevNewMoon = newMoon;
+        } else {
+          nextNewMoon = newMoon;
+          break;
+        }
+      }
+
+      // If date is outside our data range
+      if (!prevNewMoon) {
+        // Before first new moon in our data
+        prevNewMoon = { date: new Date("2024-12-31T00:00:00") }; // Approximate
+        nextNewMoon = moonPhaseData2025.newMoons[0];
+      } else if (!nextNewMoon) {
+        // After last new moon in our data
+        prevNewMoon = moonPhaseData2025.newMoons[moonPhaseData2025.newMoons.length - 1];
+        nextNewMoon = { date: new Date("2026-01-19T00:00:00") }; // Approximate
+      }
+
+      // Calculate lunar cycle duration for this specific cycle
+      const cycleDuration = nextNewMoon.date - prevNewMoon.date;
       const msPerDay = 1000 * 60 * 60 * 24;
-      const daysSinceNewMoon = (d - recentNewMoon) / msPerDay;
+      const cycleDurationDays = cycleDuration / msPerDay;
 
-      // Moon cycle is approximately 29.53 days
-      const moonCycle = 29.53;
+      // Calculate time since previous new moon
+      const timeSinceNewMoon = currentDate - prevNewMoon.date;
 
-      // Calculate the phase (0 to 1)
-      let phase = (daysSinceNewMoon % moonCycle) / moonCycle;
-
-      // Normalize between 0 and 1
-      if (phase < 0) phase += 1;
+      // Calculate phase (0 to 1)
+      const phase = timeSinceNewMoon / cycleDuration;
 
       return phase;
     }
@@ -94,130 +191,188 @@
       return "Unknown Phase";
     }
 
-    // Set up the SVG container
-    const svg = d3.select("#moon-svg");
-    const width = 400;
-    const height = 400;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = 150;
+    // Draw the moon based on the date
+    function drawMoon(date) {
+      // Use provided date or current date
+      const currentDate = date || new Date();
 
-    // Get current date
-    const currentDate = new Date();
-    const currentPhase = getMoonPhase(currentDate);
+      // Calculate moon phase
+      const phase = getMoonPhase(currentDate);
 
-    // Display phase name and date
-    document.getElementById('phase-name').textContent = getPhaseName(currentPhase) +
-      " (" + Math.round(currentPhase * 100) + "% of cycle)";
+      // Display phase name and date
+      document.getElementById('phase-name').textContent = getPhaseName(phase) +
+        " (" + Math.round(phase * 100) + "% of cycle)";
 
-    // Format the date nicely
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('date-display').textContent = currentDate.toLocaleDateString(undefined, dateOptions);
+      // Format the date
+      const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('date-display').textContent = currentDate.toLocaleDateString(undefined, dateOptions);
 
-    // Calculate rotation angle based on location (Southampton, UK)
-    // Northern hemisphere and seasonal adjustments
-    const latitude = 50.9105; // Southampton latitude
-    const dayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-    const seasonFactor = Math.sin(2 * Math.PI * dayOfYear / 365);
-    let rotationAngle = 45 + 10 * seasonFactor; // Adjust for northern hemisphere and season
+      // Clear previous SVG content
+      d3.select("#moon-svg").html("");
 
-    // Convert rotation from degrees to radians
-    const rotationRad = rotationAngle * Math.PI / 180;
+      // Set up SVG
+      const svg = d3.select("#moon-svg");
+      const width = 400;
+      const height = 400;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = 150;
 
-    // Calculate the shadow offset based on the phase
-    let shadowOffsetMagnitude;
-    if (currentPhase <= 0.5) {
-      // Waxing moon (0 = new, 0.5 = full)
-      shadowOffsetMagnitude = radius * (-1 + 2 * currentPhase);
-    } else {
-      // Waning moon (0.5 = full, 1 = new)
-      shadowOffsetMagnitude = radius * (1 - 2 * (1 - currentPhase));
-    }
+      // Calculate rotation angle
+      const dayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+      const seasonFactor = Math.sin(2 * Math.PI * dayOfYear / 365);
+      const rotationAngle = 45 + 10 * seasonFactor;
+      const rotationRad = rotationAngle * Math.PI / 180;
 
-    const shadowOffsetX = shadowOffsetMagnitude * Math.cos(rotationRad);
-    const shadowOffsetY = shadowOffsetMagnitude * Math.sin(rotationRad);
+      // Draw the base moon (illuminated part)
+      svg.append("circle")
+        .attr("cx", centerX)
+        .attr("cy", centerY)
+        .attr("r", radius)
+        .attr("fill", "#f6eed5");
 
-    // Create the full moon circle with the specified color
-    svg.append("circle")
-      .attr("cx", centerX)
-      .attr("cy", centerY)
-      .attr("r", radius)
-      .attr("fill", "#f6eed5"); // Warm cream color
+      // Calculate shadow offset
+      let shadowOffsetMagnitude;
+        if (currentPhase <= 0.5) {
+            // Waxing moon (0 = new, 0.5 = full)
+            shadowOffsetMagnitude = radius * (-1 + currentPhase * currentPhase);
+        } else if (currentPhase < 0.01 || phase > 0.99) {
+            shadowOffsetMagnitude = radius * (0);
+        } else {
+            // Waning moon (0.5 = full, 1 = new)
+            shadowOffsetMagnitude = radius * (1 + currentPhase * currentPhase);
+        }
 
-    // Create the shadow circle (black, same color as background)
-    // This covers the moon except for the visible portion
-    svg.append("circle")
-      .attr("cx", centerX + shadowOffsetX)
-      .attr("cy", centerY + shadowOffsetY)
-      .attr("r", radius)
-      .attr("fill", "#000000"); // Black like the background
+      const shadowOffsetX = shadowOffsetMagnitude * Math.cos(rotationRad);
+      const shadowOffsetY = shadowOffsetMagnitude * Math.sin(rotationRad);
 
-    // Add subtle texture to the moon surface
-    // Generate random small craters
-    for (let i = 0; i < 200; i++) {
-      // Generate points on a circle
-      const angle = Math.random() * Math.PI * 2;
-      const distance = Math.random() * radius * 0.9; // Keep inside the radius
-      const x = centerX + distance * Math.cos(angle);
-      const y = centerY + distance * Math.sin(angle);
-
-      // Calculate if the point is in the visible part of the moon
-      const vecX = x - centerX;
-      const vecY = y - centerY;
-
-      // Calculate distance to the shadow circle center
-      const distToShadowCenter = Math.sqrt(
-        Math.pow(x - (centerX + shadowOffsetX), 2) +
-        Math.pow(y - (centerY + shadowOffsetY), 2)
-      );
-
-      // Only draw craters in the visible part (outside the shadow for waxing, inside for waning)
-      if ((currentPhase <= 0.5 && distToShadowCenter > radius) ||
-          (currentPhase > 0.5 && distToShadowCenter < radius)) {
-        const craterSize = Math.random() * 2 + 0.5;
-        const opacity = Math.random() * 0.2;
-
+      // Apply shadow (skip if full moon - phase exactly 0.5)
+      if (Math.abs(phase - 0.5) > 0.01) {
         svg.append("circle")
-          .attr("cx", x)
-          .attr("cy", y)
-          .attr("r", craterSize)
-          .attr("fill", "#B0B0B0") // Slightly darker gray
-          .attr("opacity", opacity);
+          .attr("cx", centerX + shadowOffsetX)
+          .attr("cy", centerY + shadowOffsetY)
+          .attr("r", radius)
+          .attr("fill", "#000000");
       }
+
+      // Add craters to visible portion
+      if (phase > 0.01 && phase < 0.99) { // Skip for new moon
+        for (let i = 0; i < 200; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * radius * 0.9;
+          const x = centerX + distance * Math.cos(angle);
+          const y = centerY + distance * Math.sin(angle);
+
+          // Calculate distance to shadow center
+          const distToShadow = Math.sqrt(
+            Math.pow(x - (centerX + shadowOffsetX), 2) +
+            Math.pow(y - (centerY + shadowOffsetY), 2)
+          );
+
+          // Determine if crater should be visible
+          let isVisible;
+
+          if (Math.abs(phase - 0.5) < 0.01) {
+            // Full moon - all craters visible
+            isVisible = true;
+          } else if (phase < 0.5) {
+            // Waxing moon - craters outside shadow are visible
+            isVisible = distToShadow > radius;
+          } else {
+            // Waning moon - craters inside shadow are visible
+            isVisible = distToShadow < radius;
+          }
+
+          if (isVisible) {
+            const craterSize = Math.random() * 2 + 0.5;
+            const opacity = Math.random() * 0.2;
+
+            svg.append("circle")
+              .attr("cx", x)
+              .attr("cy", y)
+              .attr("r", craterSize)
+              .attr("fill", "#B0B0B0")
+              .attr("opacity", opacity);
+          }
+        }
+      }
+
+      // For new moon, add a faint outline
+      if (phase < 0.01 || phase > 0.99) {
+        svg.select("circle")
+          .attr("stroke", "rgba(255, 255, 255, 0.2)")
+          .attr("stroke-width", 1);
+      }
+
+      // Add stars
+      for (let i = 0; i < 100; i++) {
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+
+        // Keep stars away from the moon
+        const distToMoon = Math.sqrt(
+          Math.pow(x - centerX, 2) +
+          Math.pow(y - centerY, 2)
+        );
+
+        if (distToMoon > radius * 1.5) {
+          const size = Math.random() * 1.5 + 0.5;
+          const opacity = Math.random() * 0.8 + 0.2;
+
+          svg.append("circle")
+            .attr("cx", x)
+            .attr("cy", y)
+            .attr("r", size)
+            .attr("fill", "white")
+            .attr("opacity", opacity);
+        }
+      }
+
+      // Add subtle glow
+      svg.append("circle")
+        .attr("cx", centerX)
+        .attr("cy", centerY)
+        .attr("r", radius * 1.01)
+        .attr("fill", "none")
+        .attr("stroke", "rgba(255, 255, 255, 0.1)")
+        .attr("stroke-width", radius * 0.01);
     }
 
-    // Add stars to the background
-    for (let i = 0; i < 100; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
+    // Initialize date input
+    const dateInput = document.getElementById('date-input');
+    const today = new Date();
+    dateInput.value = today.toISOString().split('T')[0];
 
-      // Keep stars away from the moon
-      const distToMoon = Math.sqrt(
-        Math.pow(x - centerX, 2) +
-        Math.pow(y - centerY, 2)
-      );
+    // Set up event listeners
+    document.getElementById('show-date-btn').addEventListener('click', () => {
+      const date = new Date(dateInput.value);
+      drawMoon(date);
+    });
 
-      if (distToMoon > radius * 1.5) {
-        const size = Math.random() * 1.5 + 0.5;
-        const opacity = Math.random() * 0.8 + 0.2;
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      const today = new Date();
+      dateInput.value = today.toISOString().split('T')[0];
+      drawMoon();
+    });
 
-        svg.append("circle")
-          .attr("cx", x)
-          .attr("cy", y)
-          .attr("r", size)
-          .attr("fill", "white")
-          .attr("opacity", opacity);
-      }
+    // Initialize the visualization
+    drawMoon();
+
+    // Schedule daily updates
+    function scheduleNextUpdate() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+
+      const timeUntilNextDay = tomorrow - now;
+      setTimeout(() => {
+        drawMoon();
+        scheduleNextUpdate();
+      }, timeUntilNextDay);
     }
 
-    // Add subtle glow to the moon
-    svg.append("circle")
-      .attr("cx", centerX)
-      .attr("cy", centerY)
-      .attr("r", radius * 1.01)
-      .attr("fill", "none")
-      .attr("stroke", "rgba(255, 255, 255, 0.1)")
-      .attr("stroke-width", radius * 0.01);
+    scheduleNextUpdate();
   </script>
 </body>
 </html>
